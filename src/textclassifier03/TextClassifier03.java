@@ -5,6 +5,7 @@ import java.io.FileReader;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
 import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.EM;
@@ -28,24 +29,47 @@ public class TextClassifier03 {
     public static void main(final String[] args) throws Exception {
         System.out.println("Running");
 
-        final Classifier classifier = new SMO();
-
-        // Read Data
+        // Read Train Data
         Instances dataTrain = new Instances(new BufferedReader(new FileReader(DATA_TRAIN_FILE)));
         dataTrain.setClassIndex(dataTrain.numAttributes() - 1);
 
-        System.out.println(dataTrain);
+        // Read Test Data
+        Instances dataTest = new Instances(new BufferedReader(new FileReader(DATA_TRAIN_FILE)));
+        dataTest.setClassIndex(dataTest.numAttributes() - 1);
 
-        Remove filter = new Remove();
-        filter.setAttributeIndices("" + (dataTrain.classIndex() + 1));
-        filter.setInputFormat(dataTrain);
-        Instances dataClusterer = Filter.useFilter(dataTrain, filter);
+        StringToWordVector str2Vec = new StringToWordVector();
+        // Set Filter Parameters
+        //str2Vec.setOptions(new String[] {"-N 1" });
+        str2Vec.setLowerCaseTokens(true);
+        str2Vec.setInputFormat(dataTrain);
+        // Instances fiteredTrainData = Filter.useFilter(dataTrain, str2Vec);
+
+        J48 j48Class = new J48();
+        j48Class.setUnpruned(true);
+
+        // meta-classifier
+        FilteredClassifier fc = new FilteredClassifier();
+        fc.setFilter(str2Vec);
+        fc.setClassifier(j48Class);
+        // train 
+        fc.buildClassifier(dataTrain);
+
+        // make predictions
+        for (int i = 0; i < dataTest.numInstances(); i++) {
+            double pred = fc.classifyInstance(dataTest.instance(i));
+            System.out.print("ID: " + dataTest.instance(i).value(0));
+            System.out.print(", actual: " + dataTest.classAttribute().value((int) dataTest.instance(i).classValue()));
+            System.out.println(", predicted: " + dataTest.classAttribute().value((int) pred));
+        }
+
+
+        /*
 
         EM clusterer = new EM();
         clusterer.setNumClusters(3);
         // set further options for EM, if necessary...
-        clusterer.buildClusterer(dataClusterer);
-        System.out.println(dataClusterer);
+        clusterer.buildClusterer(fiteredTrainData);
+        System.out.println(fiteredTrainData);
 
         ClusterEvaluation eval = new ClusterEvaluation();
         eval.setClusterer(clusterer);
@@ -53,5 +77,6 @@ public class TextClassifier03 {
 
         // evaluate classifier and print some statistics
         System.out.println(eval.clusterResultsToString());
+        */ 
     }
 }
