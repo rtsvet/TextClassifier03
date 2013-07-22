@@ -19,15 +19,11 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class TextClassifier03 {
 
-    private static final String DATAFILE = "/export/Development/DataMining/Weka/weka-3-6-9/data/iris.2D.arff";
+    private static final String DATA_TRAIN_FILE = "/export/Development/DataMining/Weka/weka-3-6-9/data/ReutersCorn-train.arff";
+    private static final String DATA_TEST_FILE = "/export/Development/DataMining/Weka/weka-3-6-9/data/ReutersCorn-test.arff";
 
     /*
-     * java -cp %WEKA_HOME% 
-     weka.classifiers.meta.FilteredClassifier 
-     -t ReutersAcq-train.arff 
-     -T ReutersAcq-test.arff 
-     -W "weka.classifiers.functions.SMO -N 2" 
-     -F "weka.filters.unsupervised.attribute.StringToWordVector -S"
+     * 
      */
     public static void main(final String[] args) throws Exception {
         System.out.println("Running");
@@ -35,15 +31,15 @@ public class TextClassifier03 {
         final Classifier classifier = new SMO();
 
         // Read Data
-        Instances data = new Instances(new BufferedReader(new FileReader(DATAFILE)));
-        data.setClassIndex(data.numAttributes() - 1);
+        Instances dataTrain = new Instances(new BufferedReader(new FileReader(DATA_TRAIN_FILE)));
+        dataTrain.setClassIndex(dataTrain.numAttributes() - 1);
 
-        System.out.println(data);
+        System.out.println(dataTrain);
 
         Remove filter = new Remove();
-        filter.setAttributeIndices("" + (data.classIndex() + 1));
-        filter.setInputFormat(data);
-        Instances dataClusterer = Filter.useFilter(data, filter);
+        filter.setAttributeIndices("" + (dataTrain.classIndex() + 1));
+        filter.setInputFormat(dataTrain);
+        Instances dataClusterer = Filter.useFilter(dataTrain, filter);
 
         EM clusterer = new EM();
         clusterer.setNumClusters(3);
@@ -53,7 +49,7 @@ public class TextClassifier03 {
 
         ClusterEvaluation eval = new ClusterEvaluation();
         eval.setClusterer(clusterer);
-        eval.evaluateClusterer(data);
+        eval.evaluateClusterer(dataTrain);
 
         // evaluate classifier and print some statistics
         System.out.println(eval.clusterResultsToString());
