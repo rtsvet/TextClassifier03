@@ -72,12 +72,12 @@ public class TextClassifier03 {
         fc.buildClassifier(dataTrain);
 
         // make predictions
-        for (int i = 0; i < dataTest.numInstances(); i++) {
-            double pred = fc.classifyInstance(dataTest.instance(i));
-            System.out.print("ID: " + dataTest.instance(i).value(0));
-            System.out.print(", actual: " + dataTest.classAttribute().value((int) dataTest.instance(i).classValue()));
-            System.out.println(", predicted: " + dataTest.classAttribute().value((int) pred));
-        }
+        //for (int i = 0; i < dataTest.numInstances(); i++) {
+        //    double pred = fc.classifyInstance(dataTest.instance(i));
+        //    System.out.print("ID: " + dataTest.instance(i).value(0));
+        //    System.out.print(", actual: " + dataTest.classAttribute().value((int) dataTest.instance(i).classValue()));
+        //    System.out.println(", predicted: " + dataTest.classAttribute().value((int) pred));
+        //}
 
         // evaluate classifier and print some statistics
         Evaluation eval = new Evaluation(dataTrain);
@@ -126,7 +126,7 @@ public class TextClassifier03 {
             for (Iterator<Map.Entry<String, Double>> it = centroMap.entrySet().iterator(); it.hasNext();) {
                 System.out.println(it.next() +"; ");
                 k++;
-                if (k > 10) break;
+                if (k > 15) break;
             }
             System.out.println("End ");
             centroMap.clear();
@@ -141,7 +141,7 @@ public class TextClassifier03 {
         clEval.evaluateClusterer(strVectorTrainData);
 
         // evaluate classifier and print some statistics
-        //System.out.println(clEval.clusterResultsToString());
+        System.out.println(clEval.clusterResultsToString());
 
     }
 }
